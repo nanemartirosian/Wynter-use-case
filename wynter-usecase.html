@@ -1,0 +1,1207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wynter Index — Growth Strategy by Nané Martirosian</title>
+<link href="https://fonts.googleapis.com/css2?family=Editorial+New:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --black: #080808;
+    --white: #f0ece3;
+    --cream: #e8e2d6;
+    --accent: #c8f060;
+    --accent2: #ff5c38;
+    --muted: #3a3a3a;
+    --mid: #666;
+    --border: rgba(240,236,227,0.1);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'Syne', sans-serif;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* Custom cursor */
+  .cursor {
+    width: 10px; height: 10px;
+    background: var(--accent);
+    border-radius: 50%;
+    position: fixed;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s ease;
+    mix-blend-mode: difference;
+  }
+  .cursor-follower {
+    width: 36px; height: 36px;
+    border: 1px solid rgba(200,240,96,0.4);
+    border-radius: 50%;
+    position: fixed;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: transform 0.15s ease, width 0.3s, height 0.3s, opacity 0.3s;
+  }
+
+  /* NOISE TEXTURE OVERLAY */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0.4;
+  }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    padding: 2rem 3rem;
+    position: relative;
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+  }
+
+  .hero::after {
+    content: '';
+    position: absolute;
+    top: -200px; right: -200px;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(200,240,96,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+    opacity: 0;
+    animation: fadeUp 0.8s ease forwards;
+  }
+
+  .nav-logo {
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--mid);
+    font-family: 'DM Mono', monospace;
+  }
+
+  .nav-tag {
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--mid);
+    font-family: 'DM Mono', monospace;
+    border: 1px solid var(--muted);
+    padding: 0.35rem 0.75rem;
+    border-radius: 2px;
+  }
+
+  .hero-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 4rem 0 3rem;
+    max-width: 1100px;
+  }
+
+  .hero-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 2rem;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.2s ease forwards;
+  }
+
+  .hero-headline {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(3.5rem, 7vw, 7rem);
+    font-weight: 900;
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+    margin-bottom: 2.5rem;
+    opacity: 0;
+    animation: fadeUp 0.9s 0.3s ease forwards;
+  }
+
+  .hero-headline em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .hero-sub {
+    font-size: 1.05rem;
+    color: var(--mid);
+    max-width: 520px;
+    line-height: 1.7;
+    font-weight: 400;
+    opacity: 0;
+    animation: fadeUp 0.9s 0.5s ease forwards;
+  }
+
+  .hero-meta {
+    display: flex;
+    gap: 3rem;
+    align-items: center;
+    opacity: 0;
+    animation: fadeUp 0.9s 0.7s ease forwards;
+  }
+
+  .hero-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  .hero-stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--accent);
+    line-height: 1;
+  }
+
+  .hero-stat-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--mid);
+  }
+
+  .hero-divider {
+    width: 1px;
+    height: 50px;
+    background: var(--muted);
+  }
+
+  /* INDEX BAR */
+  .index-bar {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    border-top: 1px solid var(--border);
+    opacity: 0;
+    animation: fadeUp 0.9s 0.9s ease forwards;
+  }
+
+  .index-item {
+    padding: 1.5rem 0;
+    border-right: 1px solid var(--border);
+    padding-right: 2rem;
+    padding-left: 0.5rem;
+  }
+
+  .index-item:last-child { border-right: none; }
+
+  .index-item-score {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 0.4rem;
+  }
+
+  .index-item-score.expansion { color: var(--accent); }
+  .index-item-score.contraction { color: var(--accent2); }
+
+  .index-item-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--mid);
+    line-height: 1.4;
+  }
+
+  /* SECTIONS */
+  .section {
+    padding: 6rem 3rem;
+    border-bottom: 1px solid var(--border);
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+
+  .section.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 3rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ANALYSIS GRID */
+  .analysis-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+    background: var(--border);
+    margin-bottom: 2px;
+  }
+
+  .analysis-card {
+    background: var(--black);
+    padding: 2.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.3s;
+  }
+
+  .analysis-card:hover {
+    background: #0f0f0f;
+  }
+
+  .analysis-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px; height: 0;
+    background: var(--accent);
+    transition: height 0.4s ease;
+  }
+
+  .analysis-card:hover::before { height: 100%; }
+
+  .card-number {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    color: var(--muted);
+    margin-bottom: 1rem;
+  }
+
+  .card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 1rem;
+    color: var(--white);
+  }
+
+  .card-body {
+    font-size: 0.9rem;
+    color: #888;
+    line-height: 1.75;
+  }
+
+  .card-body strong {
+    color: var(--white);
+    font-weight: 600;
+  }
+
+  .card-tag {
+    display: inline-block;
+    margin-top: 1.5rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    border: 1px solid rgba(200,240,96,0.3);
+    padding: 0.3rem 0.6rem;
+    border-radius: 2px;
+  }
+
+  .card-tag.red {
+    color: var(--accent2);
+    border-color: rgba(255,92,56,0.3);
+  }
+
+  /* FULL WIDTH CARD */
+  .analysis-card.full {
+    grid-column: 1 / -1;
+  }
+
+  .tension-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 2rem;
+    margin-top: 1.5rem;
+  }
+
+  .tension-item {
+    border-left: 2px solid var(--border);
+    padding-left: 1.5rem;
+  }
+
+  .tension-item.accent-border { border-color: var(--accent); }
+  .tension-item.red-border { border-color: var(--accent2); }
+  .tension-item.mid-border { border-color: var(--muted); }
+
+  .tension-score {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--white);
+    line-height: 1;
+    margin-bottom: 0.5rem;
+  }
+
+  .tension-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--mid);
+    margin-bottom: 0.75rem;
+  }
+
+  .tension-text {
+    font-size: 0.85rem;
+    color: #777;
+    line-height: 1.6;
+  }
+
+  /* STRATEGY SECTION */
+  .strategy-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .step {
+    display: grid;
+    grid-template-columns: 80px 1fr auto;
+    gap: 2rem;
+    align-items: start;
+    background: #0a0a0a;
+    padding: 2.5rem;
+    border-left: 3px solid transparent;
+    transition: border-color 0.3s, background 0.3s;
+  }
+
+  .step:hover {
+    border-color: var(--accent);
+    background: #0f0f0f;
+  }
+
+  .step-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 3rem;
+    font-weight: 900;
+    color: var(--muted);
+    line-height: 1;
+    transition: color 0.3s;
+  }
+
+  .step:hover .step-num { color: var(--accent); }
+
+  .step-content {}
+
+  .step-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    color: var(--white);
+  }
+
+  .step-body {
+    font-size: 0.88rem;
+    color: #777;
+    line-height: 1.75;
+    max-width: 620px;
+  }
+
+  .step-body strong { color: #bbb; font-weight: 600; }
+
+  .step-tools {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    min-width: 140px;
+  }
+
+  .tool-chip {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: rgba(200,240,96,0.07);
+    border: 1px solid rgba(200,240,96,0.2);
+    padding: 0.3rem 0.7rem;
+    border-radius: 2px;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  /* WHAT'S MISSING */
+  .missing-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2px;
+    background: var(--border);
+  }
+
+  .missing-item {
+    background: var(--black);
+    padding: 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .missing-item::after {
+    content: '?';
+    position: absolute;
+    bottom: -10px; right: 10px;
+    font-family: 'Playfair Display', serif;
+    font-size: 6rem;
+    font-weight: 900;
+    color: rgba(255,255,255,0.02);
+    line-height: 1;
+  }
+
+  .missing-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent2);
+    margin-bottom: 1rem;
+  }
+
+  .missing-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    line-height: 1.3;
+  }
+
+  .missing-text {
+    font-size: 0.8rem;
+    color: #666;
+    line-height: 1.65;
+  }
+
+  /* WYNTER FIT */
+  .fit-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-top: 2rem;
+  }
+
+  .fit-item {
+    border: 1px solid var(--border);
+    padding: 2rem;
+    position: relative;
+    transition: border-color 0.3s;
+  }
+
+  .fit-item:hover { border-color: rgba(200,240,96,0.3); }
+
+  .fit-finding {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--mid);
+    margin-bottom: 0.75rem;
+  }
+
+  .fit-arrow {
+    font-size: 1.5rem;
+    color: var(--accent);
+    margin: 0.75rem 0;
+  }
+
+  .fit-use-case {
+    font-size: 0.9rem;
+    color: var(--white);
+    font-weight: 600;
+    line-height: 1.4;
+  }
+
+  .fit-sub {
+    font-size: 0.8rem;
+    color: #666;
+    margin-top: 0.5rem;
+    line-height: 1.6;
+  }
+
+  /* GOAL BOX */
+  .goal-box {
+    background: var(--accent);
+    color: var(--black);
+    padding: 3rem;
+    margin-top: 4rem;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 2rem;
+  }
+
+  .goal-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(0,0,0,0.5);
+    margin-bottom: 0.75rem;
+  }
+
+  .goal-headline {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    font-weight: 900;
+    line-height: 1.1;
+  }
+
+  .goal-metrics {
+    display: flex;
+    gap: 2.5rem;
+  }
+
+  .goal-metric {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .goal-metric-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.2rem;
+    font-weight: 900;
+    line-height: 1;
+    color: var(--black);
+  }
+
+  .goal-metric-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgba(0,0,0,0.5);
+  }
+
+  /* FOOTER / CLOSER */
+  .closer {
+    padding: 5rem 3rem;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: end;
+    gap: 3rem;
+  }
+
+  .closer-main {}
+
+  .closer-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1.5rem;
+  }
+
+  .closer-headline {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.5rem, 4vw, 4rem);
+    font-weight: 900;
+    line-height: 1.05;
+    margin-bottom: 1.5rem;
+    max-width: 700px;
+  }
+
+  .closer-sub {
+    font-size: 0.95rem;
+    color: var(--mid);
+    max-width: 500px;
+    line-height: 1.7;
+  }
+
+  .closer-sig {
+    text-align: right;
+  }
+
+  .sig-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    font-weight: 700;
+    font-style: italic;
+    margin-bottom: 0.5rem;
+  }
+
+  .sig-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--mid);
+  }
+
+  /* HORIZONTAL TICKER */
+  .ticker {
+    background: var(--accent);
+    padding: 0.75rem 0;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  .ticker-inner {
+    display: inline-flex;
+    animation: ticker 25s linear infinite;
+  }
+
+  .ticker-item {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--black);
+    padding: 0 2rem;
+  }
+
+  .ticker-dot {
+    color: rgba(0,0,0,0.3);
+  }
+
+  /* PROGRESS BAR */
+  .progress-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+
+  .progress-row {
+    display: grid;
+    grid-template-columns: 200px 1fr 60px;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .progress-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--mid);
+  }
+
+  .progress-track {
+    height: 3px;
+    background: rgba(255,255,255,0.07);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+    width: 0;
+    transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .progress-fill.red { background: var(--accent2); }
+
+  .progress-score {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--white);
+    text-align: right;
+  }
+
+  /* QUOTE */
+  .quote-block {
+    border-left: 3px solid var(--accent);
+    padding: 2rem 2.5rem;
+    margin: 3rem 0;
+    background: rgba(200,240,96,0.03);
+  }
+
+  .quote-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    font-style: italic;
+    line-height: 1.5;
+    color: var(--white);
+    margin-bottom: 1rem;
+  }
+
+  .quote-source {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--mid);
+  }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes ticker {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  @media (max-width: 768px) {
+    .hero { padding: 1.5rem; }
+    .section { padding: 4rem 1.5rem; }
+    .analysis-grid { grid-template-columns: 1fr; }
+    .tension-grid { grid-template-columns: 1fr; }
+    .missing-grid { grid-template-columns: 1fr 1fr; }
+    .step { grid-template-columns: 50px 1fr; }
+    .step-tools { display: none; }
+    .index-bar { grid-template-columns: 1fr 1fr; }
+    .goal-box { grid-template-columns: 1fr; }
+    .goal-metrics { flex-wrap: wrap; }
+    .closer { grid-template-columns: 1fr; }
+    .fit-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-follower" id="follower"></div>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-inner">
+    <span class="ticker-item">Wynter Index Q1 2026</span><span class="ticker-dot"> ✦ </span>
+    <span class="ticker-item">Composite: 58.6 — Expansion</span><span class="ticker-dot"> ✦ </span>
+    <span class="ticker-item">Software Spend: All-Time High at 64.8</span><span class="ticker-dot"> ✦ </span>
+    <span class="ticker-item">49% of New Software Dollars → AI & Automation</span><span class="ticker-dot"> ✦ </span>
+    <span class="ticker-item">Pipeline Priority: Up to 72%</span><span class="ticker-dot"> ✦ </span>
+    <span class="ticker-item">Brand Comeback: 45.5%</span><span class="ticker-dot"> ✦ </span>
+    <span class="ticker-item">Growth Strategy by Nané Martirosian</span><span class="ticker-dot"> ✦ </span>
+    <span class="ticker-item">Wynter Index Q1 2026</span><span class="ticker-dot"> ✦ </span>
+    <span class="ticker-item">Composite: 58.6 — Expansion</span><span class="ticker-dot"> ✦ </span>
+    <span class="ticker-item">Software Spend: All-Time High at 64.8</span><span class="ticker-dot"> ✦ </span>
+    <span class="ticker-item">49% of New Software Dollars → AI & Automation</span><span class="ticker-dot"> ✦ </span>
+    <span class="ticker-item">Pipeline Priority: Up to 72%</span><span class="ticker-dot"> ✦ </span>
+    <span class="ticker-item">Brand Comeback: 45.5%</span><span class="ticker-dot"> ✦ </span>
+    <span class="ticker-item">Growth Strategy by Nané Martirosian</span><span class="ticker-dot"> ✦ </span>
+  </div>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <nav class="nav">
+    <span class="nav-logo">Wynter Index — Q1 2026 / Growth Response</span>
+    <span class="nav-tag">Prepared by Nané Martirosian</span>
+  </nav>
+
+  <div class="hero-content">
+    <p class="hero-label">Scenario Response + Index Analysis</p>
+    <h1 class="hero-headline">
+      12 views.<br>
+      <em>Now what?</em>
+    </h1>
+    <p class="hero-sub">A thorough read of the Wynter Index Q1 2026 — and a concrete, AI-native plan to fix a distribution failure and build a system that works.</p>
+  </div>
+
+  <div class="hero-meta">
+    <div class="hero-stat">
+      <span class="hero-stat-num">58.6</span>
+      <span class="hero-stat-label">Composite Index</span>
+    </div>
+    <div class="hero-divider"></div>
+    <div class="hero-stat">
+      <span class="hero-stat-num">64.8</span>
+      <span class="hero-stat-label">Software Spend (All-time high)</span>
+    </div>
+    <div class="hero-divider"></div>
+    <div class="hero-stat">
+      <span class="hero-stat-num">49%</span>
+      <span class="hero-stat-label">New dollars → AI tools</span>
+    </div>
+    <div class="hero-divider"></div>
+    <div class="hero-stat">
+      <span class="hero-stat-num">72%</span>
+      <span class="hero-stat-label">Pipeline as top priority</span>
+    </div>
+  </div>
+</section>
+
+<!-- INDEX BREAKDOWN -->
+<section class="section" id="s1">
+  <p class="section-label">The Five Sub-Indices</p>
+
+  <div class="index-bar" style="display:grid; grid-template-columns: repeat(5,1fr); gap: 2px; background: var(--border); margin-bottom: 3rem;">
+    <div class="index-item" style="background: var(--black); padding: 2rem 1.5rem;">
+      <div class="index-item-score contraction">49.0</div>
+      <div class="index-item-label">Performance<br>to Revenue Plan</div>
+    </div>
+    <div class="index-item" style="background: var(--black); padding: 2rem 1.5rem;">
+      <div class="index-item-score expansion">61.0</div>
+      <div class="index-item-label">FTE<br>Headcount</div>
+    </div>
+    <div class="index-item" style="background: var(--black); padding: 2rem 1.5rem;">
+      <div class="index-item-score expansion">64.3</div>
+      <div class="index-item-label">Ads &<br>Paid Media</div>
+    </div>
+    <div class="index-item" style="background: var(--black); padding: 2rem 1.5rem;">
+      <div class="index-item-score expansion" style="color: #c8f060; font-size: 2rem;">64.8 ↑</div>
+      <div class="index-item-label">Software Spend<br>ALL-TIME HIGH</div>
+    </div>
+    <div class="index-item" style="background: var(--black); padding: 2rem 1.5rem; border-right: none;">
+      <div class="index-item-score expansion">53.8</div>
+      <div class="index-item-label">Agency &<br>Consultant Spend</div>
+    </div>
+  </div>
+
+  <div class="progress-bars" id="progressBars">
+    <div class="progress-row">
+      <span class="progress-label">Revenue Performance</span>
+      <div class="progress-track"><div class="progress-fill red" data-width="49"></div></div>
+      <span class="progress-score">49.0</span>
+    </div>
+    <div class="progress-row">
+      <span class="progress-label">FTE Headcount</span>
+      <div class="progress-track"><div class="progress-fill" data-width="61"></div></div>
+      <span class="progress-score">61.0</span>
+    </div>
+    <div class="progress-row">
+      <span class="progress-label">Paid Media</span>
+      <div class="progress-track"><div class="progress-fill" data-width="64.3"></div></div>
+      <span class="progress-score">64.3</span>
+    </div>
+    <div class="progress-row">
+      <span class="progress-label">Software Spend</span>
+      <div class="progress-track"><div class="progress-fill" data-width="64.8"></div></div>
+      <span class="progress-score">64.8 ★</span>
+    </div>
+    <div class="progress-row">
+      <span class="progress-label">Agency Spend</span>
+      <div class="progress-track"><div class="progress-fill" data-width="53.8"></div></div>
+      <span class="progress-score">53.8</span>
+    </div>
+  </div>
+
+  <p style="font-family: 'DM Mono', monospace; font-size: 0.62rem; color: var(--muted); margin-top: 1rem; letter-spacing: 0.1em;">
+    &lt;50 = contraction &nbsp;|&nbsp; 50 = no change &nbsp;|&nbsp; &gt;50 = expansion &nbsp;|&nbsp; 52-55 = mild expansion &nbsp;|&nbsp; &gt;55 = solid expansion
+  </p>
+</section>
+
+<!-- ANALYSIS -->
+<section class="section" id="s2">
+  <p class="section-label">What the Data Actually Says</p>
+
+  <div class="quote-block">
+    <p class="quote-text">"The headline is optimistic. The subtext is anxious."</p>
+    <p class="quote-source">The real read of Q1 2026</p>
+  </div>
+
+  <div class="analysis-grid">
+    <div class="analysis-card full">
+      <div class="card-number">00 — Core tension</div>
+      <div class="card-title">Spending more. Hitting less.</div>
+      <div class="card-body">
+        Teams are spending more on ads, hiring more people, and buying more software — while <strong>performance-to-plan sits at 49.0, still in contraction.</strong> This isn't confidence driving investment. It's pressure. The dominant behavior pattern is "invest our way out of a gap," not "we're winning and doubling down." That tension is the most important thing in this entire report.
+      </div>
+      <div class="tension-grid" style="margin-top: 2rem;">
+        <div class="tension-item accent-border">
+          <div class="tension-score">66.2</div>
+          <div class="tension-label">VC-backed headcount expansion</div>
+          <div class="tension-text">Most aggressive hiring in the dataset — despite being the worst performers at 47.1 revenue plan. Investor growth mandates overriding execution reality.</div>
+        </div>
+        <div class="tension-item red-border">
+          <div class="tension-score">35.7</div>
+          <div class="tension-label">Medium company (50-199) revenue performance</div>
+          <div class="tension-text">Deep contraction. Over half below plan. Yet they're also the most aggressive hirers at 65.7 and increasing software spend at 42.5%. Either a calculated bet or denial.</div>
+        </div>
+        <div class="tension-item mid-border">
+          <div class="tension-score">52.7</div>
+          <div class="tension-label">Mid-market (200-999) only segment above 50</div>
+          <div class="tension-text">The quiet winners. Best performance-to-plan, strong headcount expansion, leading agency spend. Scale without public-company constraints is proving to be an advantage.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="analysis-card">
+      <div class="card-number">01 — Software</div>
+      <div class="card-title">AI isn't adding to the stack. It's replacing it.</div>
+      <div class="card-body">
+        49% of new software dollars going to AI and automation is huge. But the real signal is what's happening alongside it: <strong>26% of teams are actively consolidating and cutting legacy tools.</strong> Seat-based enrichment tools, standalone ABM platforms, underused point solutions — being killed off and replaced by AI that does multiple jobs. For any martech company selling to marketers right now, this is existential. You either position around AI or you're in the cut column.
+      </div>
+      <span class="card-tag">Replacement behavior</span>
+    </div>
+
+    <div class="analysis-card">
+      <div class="card-number">02 — Brand</div>
+      <div class="card-title">Brand is back — and it's tied to AI discoverability.</div>
+      <div class="card-body">
+        Brand jumped from 39% to <strong>45.5% as a top priority.</strong> But this isn't nostalgia. Several respondents explicitly tied brand investment to AI discoverability — meaning if your brand doesn't have a strong presence in AI-generated answers, you're invisible to a growing chunk of buyers. Brand is now infrastructure, not just awareness. This is the most forward-looking signal in the dataset.
+      </div>
+      <span class="card-tag">Forward-looking signal</span>
+    </div>
+
+    <div class="analysis-card">
+      <div class="card-number">03 — Channels</div>
+      <div class="card-title">Paid Search and LinkedIn hold. Everything else is getting cut.</div>
+      <div class="card-body">
+        The paid channel story is clean: <strong>Paid Search (42%) and LinkedIn (32%) are holding.</strong> Meta, YouTube, and programmatic are losing budget — cited for poor attribution and ROI. The organic story is more interesting: "AEO" (Answer Engine Optimization) now appears alongside SEO as a real budget category. Teams are already optimizing for AI-generated answers, not just Google rankings. <strong>53.5% cite low ROI</strong> as the primary driver for cuts.
+      </div>
+      <span class="card-tag red">Channel reckoning</span>
+    </div>
+
+    <div class="analysis-card">
+      <div class="card-number">04 — Pipeline</div>
+      <div class="card-title">Pipeline pressure is accelerating, not easing.</div>
+      <div class="card-body">
+        <strong>72% of respondents named pipeline, demand gen, or acquisition as a top-three priority</strong> — up from 66% in Q4 2025. This is not a recovery story. Teams are under more pressure than last quarter to produce pipeline, and they're throwing headcount, software, and ad spend at the problem. The question this data doesn't answer: is any of it working? Performance to plan at 49.0 says not yet.
+      </div>
+      <span class="card-tag red">High urgency</span>
+    </div>
+  </div>
+</section>
+
+<!-- WHAT'S MISSING -->
+<section class="section" id="s3">
+  <p class="section-label">What This Data Doesn't Tell Us (And Should)</p>
+
+  <div class="missing-grid">
+    <div class="missing-item">
+      <div class="missing-label">Gap 01</div>
+      <div class="missing-title">No NRR or retention data</div>
+      <div class="missing-text">Every investment signal is acquisition-focused. Is anyone actually growing through their existing base? Net revenue retention is the cleanest sign of product-market fit and it's completely absent.</div>
+    </div>
+    <div class="missing-item">
+      <div class="missing-label">Gap 02</div>
+      <div class="missing-title">AI priority vs. AI spend don't match</div>
+      <div class="missing-text">39.5% name AI as a top priority. But 49% of software dollars are already going there. Stated priority is lagging actual wallet behavior — suggesting either underreporting or that AI is now table stakes, not a priority.</div>
+    </div>
+    <div class="missing-item">
+      <div class="missing-label">Gap 03</div>
+      <div class="missing-title">No data on AI ROI measurement</div>
+      <div class="missing-text">Teams are betting nearly half their software budget on AI but there's no data on how they're measuring returns. This is the question everyone is quietly struggling with and it's a massive content opportunity.</div>
+    </div>
+    <div class="missing-item">
+      <div class="missing-label">Gap 04 → Opportunity</div>
+      <div class="missing-title">AEO is mentioned, not measured</div>
+      <div class="missing-text">Answer Engine Optimization shows up in investment data but isn't tracked as its own category yet. This gap is something Wynter could directly fill — and own — with a single added question next quarter.</div>
+    </div>
+  </div>
+</section>
+
+<!-- WYNTER FIT -->
+<section class="section" id="s4">
+  <p class="section-label">Why This Data Is a Door Into Every Wynter Use Case</p>
+
+  <p style="font-size: 0.95rem; color: var(--mid); max-width: 680px; line-height: 1.75; margin-bottom: 0.5rem;">
+    The Index describes Wynter's exact ICP — and every major finding opens a conversation Wynter can own. The job as growth marketer is to make that connection explicit in every piece of distribution.
+  </p>
+
+  <div class="fit-grid">
+    <div class="fit-item">
+      <div class="fit-finding">Finding: Pipeline is #1 priority for 72% of teams</div>
+      <div class="fit-arrow">↓</div>
+      <div class="fit-use-case">Message testing to sharpen pipeline messaging before spend</div>
+      <div class="fit-sub">If you're going to bet on Paid Search and LinkedIn, you need to know your message actually lands with your ICP. That's Wynter's core product.</div>
+    </div>
+    <div class="fit-item">
+      <div class="fit-finding">Finding: Brand tied to AI discoverability at 45.5%</div>
+      <div class="fit-arrow">↓</div>
+      <div class="fit-use-case">Brand tracking + ICP Pulse to monitor perception in AI-era</div>
+      <div class="fit-sub">Marketers reinvesting in brand but don't have a way to measure it in AI search contexts. Wynter's brand tracking becomes infrastructure, not just reporting.</div>
+    </div>
+    <div class="fit-item">
+      <div class="fit-finding">Finding: Medium companies (50-199) deep in contraction at 35.7</div>
+      <div class="fit-arrow">↓</div>
+      <div class="fit-use-case">Market research surveys to understand why ICP conversion is breaking</div>
+      <div class="fit-sub">These teams are spending and not seeing results. They need to understand where the buyer journey is breaking — fast. Wynter's 48hr turnaround is the exact answer.</div>
+    </div>
+    <div class="fit-item">
+      <div class="fit-finding">Finding: Low ROI (53.5%) driving ad channel cuts</div>
+      <div class="fit-arrow">↓</div>
+      <div class="fit-use-case">Preference testing + landing page tests before reallocating budget</div>
+      <div class="fit-sub">Before killing a channel, test whether the problem is the channel or the message. Wynter sits exactly at that decision point.</div>
+    </div>
+  </div>
+</section>
+
+<!-- STRATEGY -->
+<section class="section" id="s5">
+  <p class="section-label">The Plan: From 12 Views to 1,200 in 7 Days</p>
+
+  <p style="font-size: 0.95rem; color: var(--mid); max-width: 660px; line-height: 1.75; margin-bottom: 3rem;">
+    First move: diagnose before distributing. 12 views in 3 days is a distribution failure, not a content one. Pull the analytics. Was the email actually sent? Did the LinkedIn post reach anyone beyond followers? Did anyone contact the 200 respondents? Usually the answer is "we published and hoped." Fix the system, don't just post more.
+  </p>
+
+  <div class="strategy-steps">
+    <div class="step">
+      <div class="step-num">01</div>
+      <div class="step-content">
+        <div class="step-title">Activate the 200 respondents — they are the cheat code</div>
+        <div class="step-body">
+          These are B2B marketing leaders who gave their time to be in this report. Use <strong>Clay</strong> to pull their LinkedIn profiles and build a personalised outreach sequence. Then use <strong>Claude</strong> to generate segment-specific messages — not "hey check out the report" but "you're a VC-backed CMO and your cohort is hiring most aggressively while underperforming on plan — figured you'd want to share that." People share things when they see themselves in the data. This alone can drive 50+ organic reshares from high-authority accounts.
+        </div>
+      </div>
+      <div class="step-tools">
+        <span class="tool-chip">Clay</span>
+        <span class="tool-chip">Apollo</span>
+        <span class="tool-chip">Claude</span>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">02</div>
+      <div class="step-content">
+        <div class="step-title">Turn the data into channel-native content, not reposts</div>
+        <div class="step-body">
+          The Index has 7-10 genuinely counter-intuitive findings. Use <strong>Claude</strong> to extract each one and turn it into a standalone LinkedIn post, a thread, and a stat card. Not "here's our quarterly report" but "software spend just hit an all-time high and nearly half is going to AI tools — here's what else B2B marketers are betting on right now." Each piece links back to the full Index. <strong>Peep's personal audience dwarfs the company page</strong> — that's where to focus first. Schedule across both.
+        </div>
+      </div>
+      <div class="step-tools">
+        <span class="tool-chip">Claude</span>
+        <span class="tool-chip">Canva</span>
+        <span class="tool-chip">Buffer</span>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">03</div>
+      <div class="step-content">
+        <div class="step-title">Pitch it as a news hook — the data is already citation-ready</div>
+        <div class="step-body">
+          The Index is freely citable with attribution — that's a built-in press angle. Use <strong>Perplexity</strong> to identify B2B marketing newsletters, Substack writers, and journalists covering martech and SaaS benchmarks (Exit Five, The Diff, Stacking Growth, Marketing Examined). Use <strong>Claude</strong> to draft 3-line pitches per outlet, leading with the strongest data point: software spend at an all-time high with AI capturing nearly half of new budget. That is a publishable story.
+        </div>
+      </div>
+      <div class="step-tools">
+        <span class="tool-chip">Perplexity</span>
+        <span class="tool-chip">Claude</span>
+        <span class="tool-chip">Hunter.io</span>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">04</div>
+      <div class="step-content">
+        <div class="step-title">Audit AI discoverability — the Index page has a /ai-info-page for a reason</div>
+        <div class="step-body">
+          Run a quick check with <strong>Profound</strong> or <strong>Otterly</strong> to see if the Index surfaces when someone asks ChatGPT, Perplexity, or Claude "what's the B2B marketing benchmark for 2026." If it's not showing up, small page copy and structured data tweaks can fix that fast. Given that the brand priority finding is explicitly tied to AI discoverability, Wynter's own Index should be a test case for the thing it's reporting on.
+        </div>
+      </div>
+      <div class="step-tools">
+        <span class="tool-chip">Profound</span>
+        <span class="tool-chip">Otterly</span>
+        <span class="tool-chip">AEO audit</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="goal-box">
+    <div>
+      <div class="goal-label">Week One Goal</div>
+      <div class="goal-headline">From 12 views to<br>a distribution system.</div>
+    </div>
+    <div class="goal-metrics">
+      <div class="goal-metric">
+        <span class="goal-metric-num">1,200+</span>
+        <span class="goal-metric-label">Views week one</span>
+      </div>
+      <div class="goal-metric">
+        <span class="goal-metric-num">50+</span>
+        <span class="goal-metric-label">Respondent shares</span>
+      </div>
+      <div class="goal-metric">
+        <span class="goal-metric-num">3+</span>
+        <span class="goal-metric-label">Newsletter pickups</span>
+      </div>
+      <div class="goal-metric">
+        <span class="goal-metric-num">Top 3</span>
+        <span class="goal-metric-label">AI search result</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CLOSER -->
+<section class="closer" id="s6">
+  <div class="closer-main">
+    <p class="closer-label">Bottom line</p>
+    <h2 class="closer-headline">The asset is solid.<br>It just needs a distribution system built around it.</h2>
+    <p class="closer-sub">This is the kind of problem I genuinely enjoy — where the work is already done and the gap is entirely in execution. Every step above is AI-assisted, measurable, and built to compound across quarters, not just spike for a week.</p>
+  </div>
+  <div class="closer-sig">
+    <div class="sig-name">Nané</div>
+    <div class="sig-title">AI-Native Growth Marketer<br>Use AI. Think faster. Market smarter.</div>
+  </div>
+</section>
+
+<script>
+  // Custom cursor
+  const cursor = document.getElementById('cursor');
+  const follower = document.getElementById('follower');
+  let mouseX = 0, mouseY = 0, followerX = 0, followerY = 0;
+
+  document.addEventListener('mousemove', (e) => {
+    mouseX = e.clientX; mouseY = e.clientY;
+    cursor.style.left = mouseX + 'px';
+    cursor.style.top = mouseY + 'px';
+  });
+
+  function animateFollower() {
+    followerX += (mouseX - followerX) * 0.12;
+    followerY += (mouseY - followerY) * 0.12;
+    follower.style.left = followerX + 'px';
+    follower.style.top = followerY + 'px';
+    requestAnimationFrame(animateFollower);
+  }
+  animateFollower();
+
+  // Scroll reveal
+  const sections = document.querySelectorAll('.section');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        // Animate progress bars when section 1 appears
+        if (entry.target.id === 's1') {
+          setTimeout(() => {
+            document.querySelectorAll('.progress-fill').forEach(bar => {
+              bar.style.width = bar.dataset.width + '%';
+            });
+          }, 300);
+        }
+      }
+    });
+  }, { threshold: 0.1 });
+
+  sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>
